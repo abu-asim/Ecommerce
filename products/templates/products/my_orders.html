@@ -1,0 +1,378 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Orders - DjangoShop</title>
+
+    <link rel="stylesheet" href="{% static 'products/style.css' %}">
+
+</head>
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+            <a href="/products/" class="brand">
+                DjangoShop <span>🛒</span>
+            </a>
+
+            <div class="nav-links">
+
+                <a href="/products/">
+                    Products
+                </a>
+
+                <a href="/products/my-orders/" class="orders-link">
+                    📦 My Orders
+                </a>
+
+                <a href="/products/cart/" class="cart-link">
+                    🛒 My Cart
+                </a>
+
+                <form
+                   method="POST"
+                   action="{% url 'logout' %}">
+                    {% csrf_token %}
+
+                   <button
+                     type="submit"
+                     class="logout-link">
+                     Logout
+                   </button>
+                </form>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="orders-page">
+
+
+        <!-- HEADER -->
+
+        <section class="orders-header">
+
+            <div>
+
+                <p class="orders-label">
+                    ORDER HISTORY
+                </p>
+
+                <h1>
+                    My Orders 📦
+                </h1>
+
+                <p>
+                    Track and manage all your previous orders.
+                </p>
+
+            </div>
+
+            <a href="/products/" class="shop-more-btn">
+                Continue Shopping →
+            </a>
+
+        </section>
+
+
+        {% if orders %}
+
+
+        <!-- ================= ORDER LIST ================= -->
+
+        <section class="orders-list">
+
+            {% for order in orders %}
+
+            <article class="order-card">
+
+
+                <!-- ORDER TOP -->
+
+                <div class="order-card-header">
+
+                    <div class="order-id">
+
+                        <span class="package-icon">
+                            📦
+                        </span>
+
+                        <div>
+
+                            <p>
+                                ORDER
+                            </p>
+
+                            <h2>
+                                #{{ order.id }}
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- STATUS -->
+
+                    <div class="order-status
+                        {% if order.status == 'pending' %}
+                            status-pending
+                        {% elif order.status == 'processing' %}
+                            status-processing
+                        {% elif order.status == 'shipped' %}
+                            status-shipped
+                        {% elif order.status == 'delivered' %}
+                            status-delivered
+                        {% endif %}
+                    ">
+
+                        {% if order.status == 'pending' %}
+                            ⏳
+                        {% elif order.status == 'processing' %}
+                            ⚙️
+                        {% elif order.status == 'shipped' %}
+                            🚚
+                        {% elif order.status == 'delivered' %}
+                            ✅
+                        {% endif %}
+
+                        {{ order.get_status_display }}
+
+                    </div>
+
+                </div>
+
+
+                <!-- ORDER INFO -->
+
+                <div class="order-info-grid">
+
+
+                    <div class="order-info-box">
+
+                        <span>
+                            ORDER DATE
+                        </span>
+                        <div class="order-info-box">
+                            <span>Payment</span>
+                            <strong>
+                                {{ order.get_payment_method_display }}
+                            </strong>
+                        </div>
+
+                        <strong>
+                            {{ order.created_at|date:"d M Y" }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="order-info-box">
+
+                        <span>
+                            ITEMS
+                        </span>
+
+                        <strong>
+                            {{ order.items.count }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="order-info-box">
+                       <span>ORDER DATE</span>
+                          <strong>{{ order.created_at|date:"d M Y, h:i A" }}</strong>
+                    </div>
+
+                    <div class="order-info-box">
+                        <span>TOTAL AMOUNT</span>
+                        <strong class="order-price">₹{{ order.total_amount }}</strong>
+                    </div>
+
+                    <div class="order-info-box">
+                       <span>PAYMENT METHOD</span>
+                     <strong>{{ order.get_payment_method_display }}</strong>
+                    </div>
+
+                </div>
+
+
+                <!-- PRODUCTS -->
+
+                <div class="order-products">
+
+                    <p class="products-title">
+                        PRODUCTS
+                    </p>
+
+                    {% for item in order.items.all %}
+
+                    <div class="order-product">
+
+                        <div class="order-product-image">
+
+                            {% if item.product.image %}
+
+                                <img
+                                    src="{{ item.product.image.url }}"
+                                    alt="{{ item.product.name }}"
+                                >
+
+                            {% else %}
+
+                                <span>
+                                    📦
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="order-product-details">
+
+                            <h3>
+                                {{ item.product.name }}
+                            </h3>
+
+                            <p>
+                                Quantity: {{ item.quantity }}
+                            </p>
+
+                        </div>
+
+
+                        <strong>
+                            ₹{{ item.price }}
+                        </strong>
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- FOOTER -->
+
+                <div class="order-card-footer">
+
+                    <span class="order-delivery-note">
+                        🔐 Order secured by DjangoShop
+                    </span>
+
+                    <a
+                        href="{% url 'order_detail' order.id %}"
+                        class="order-details-btn"
+                    >
+                        View Order Details
+                        <span>→</span>
+                    </a>
+
+                </div>
+
+
+            </article>
+
+            {% endfor %}
+
+        </section>
+
+
+        {% else %}
+
+
+        <!-- ================= EMPTY ORDERS ================= -->
+
+        <section class="empty-orders">
+
+            <div class="empty-orders-icon">
+                📦
+            </div>
+
+            <h2>
+                No Orders Yet
+            </h2>
+
+            <p>
+                You haven't placed any orders yet.
+                Start shopping and your orders will appear here.
+            </p>
+
+            <a href="/products/">
+                Start Shopping →
+            </a>
+
+        </section>
+
+
+        {% endif %}
+
+
+    </main>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div class="footer-content">
+
+            <div>
+
+                <h2>
+                    DjangoShop 🛒
+                </h2>
+
+                <p>
+                    Your simple and modern online shopping experience.
+                </p>
+
+            </div>
+
+            <div class="footer-links">
+
+                <a href="/products/">
+                    Products
+                </a>
+
+                <a href="/products/cart/">
+                    Cart
+                </a>
+
+                <a href="/products/my-orders/">
+                    Orders
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+
+            © 2026 DjangoShop. All rights reserved.
+
+        </div>
+
+    </footer>
+
+</body>
+
+</html>

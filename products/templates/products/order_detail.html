@@ -1,0 +1,604 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Order #{{ order.id }} - DjangoShop</title>
+
+    <link rel="stylesheet" href="{% static 'products/style.css' %}">
+
+</head>
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+            <a href="/products/" class="brand">
+                DjangoShop <span>🛒</span>
+            </a>
+
+            <div class="nav-links">
+
+                <a href="/products/">
+                    Products
+                </a>
+
+                <a href="/products/my-orders/" class="orders-link">
+                    📦 My Orders
+                </a>
+
+                <a href="/products/cart/" class="cart-link">
+                    🛒 My Cart
+                </a>
+
+                <form
+                  method="POST"
+                  action="{% url 'logout' %}">
+                  {% csrf_token %}
+
+                  <button
+                     type="submit"
+                     class="logout-link">
+                    Logout
+                  </button>
+                </form>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="order-detail-page">
+
+
+        <!-- ================= HEADER ================= -->
+
+        <section class="order-detail-header">
+
+            <div>
+
+                <p class="order-detail-label">
+                    ORDER DETAILS
+                </p>
+
+                <h1>
+                    Order #{{ order.id }} 📦
+                </h1>
+
+                <p>
+                    Placed on {{ order.created_at|date:"d M Y, h:i A" }}
+                </p>
+
+            </div>
+
+
+            <a
+                href="/products/my-orders/"
+                class="back-orders-btn"
+            >
+                ← Back to Orders
+            </a>
+
+        </section>
+
+
+        <!-- ================= STATUS TIMELINE ================= -->
+
+        <section class="tracking-card">
+
+            <div class="tracking-header">
+
+                <div>
+
+                    <p class="tracking-label">
+                        ORDER TRACKING
+                    </p>
+
+                    <h2>
+                        Your Order Status
+                    </h2>
+
+                </div>
+
+                <span class="current-status">
+                    {{ order.get_status_display }}
+                </span>
+
+            </div>
+
+
+            <div class="status-timeline">
+
+
+                <!-- PENDING -->
+
+                <div class="timeline-step
+                    {% if order.status == 'pending' or order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}
+                        completed
+                    {% endif %}
+                ">
+
+                    <div class="timeline-icon">
+                        {% if order.status == 'pending' or order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}
+                            ✓
+                        {% else %}
+                            1
+                        {% endif %}
+                    </div>
+
+                    <div class="timeline-content">
+
+                        <strong>
+                            Order Placed
+                        </strong>
+
+                        <span>
+                            Your order has been received
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PROCESSING -->
+
+                <div class="timeline-line
+                    {% if order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}
+                        active
+                    {% endif %}
+                "></div>
+
+
+                <div class="timeline-step
+                    {% if order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}
+                        completed
+                    {% endif %}
+                ">
+
+                    <div class="timeline-icon">
+                        {% if order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}
+                            ✓
+                        {% else %}
+                            2
+                        {% endif %}
+                    </div>
+
+                    <div class="timeline-content">
+
+                        <strong>
+                            Processing
+                        </strong>
+
+                        <span>
+                            Your order is being prepared
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SHIPPED -->
+
+                <div class="timeline-line
+                    {% if order.status == 'shipped' or order.status == 'delivered' %}
+                        active
+                    {% endif %}
+                "></div>
+
+
+                <div class="timeline-step
+                    {% if order.status == 'shipped' or order.status == 'delivered' %}
+                        completed
+                    {% endif %}
+                ">
+
+                    <div class="timeline-icon">
+                        {% if order.status == 'shipped' or order.status == 'delivered' %}
+                            ✓
+                        {% else %}
+                            3
+                        {% endif %}
+                    </div>
+
+                    <div class="timeline-content">
+
+                        <strong>
+                            Shipped
+                        </strong>
+
+                        <span>
+                            Your package is on the way
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DELIVERED -->
+
+                <div class="timeline-line
+                    {% if order.status == 'delivered' %}
+                        active
+                    {% endif %}
+                "></div>
+
+
+                <div class="timeline-step
+                    {% if order.status == 'delivered' %}
+                        completed
+                    {% endif %}
+                ">
+
+                    <div class="timeline-icon">
+                        {% if order.status == 'delivered' %}
+                            ✓
+                        {% else %}
+                            4
+                        {% endif %}
+                    </div>
+
+                    <div class="timeline-content">
+
+                        <strong>
+                            Delivered
+                        </strong>
+
+                        <span>
+                            Package delivered successfully
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= DETAILS GRID ================= -->
+
+        <div class="order-detail-layout">
+
+
+            <!-- ================= PRODUCTS ================= -->
+
+            <section class="detail-products-card">
+
+                <div class="detail-card-heading">
+
+                    <div>
+
+                        <p>
+                            ORDER ITEMS
+                        </p>
+
+                        <h2>
+                            Products
+                        </h2>
+
+                    </div>
+
+                    <span>
+                        {{ order_items|length }} item{{ order_items|length|pluralize }}
+                    </span>
+
+                </div>
+
+
+                <div class="detail-product-list">
+
+                    {% for item in order_items %}
+
+                    <div class="detail-product">
+
+                        <div class="detail-product-image">
+
+                            {% if item.product.image %}
+
+                                <img
+                                    src="{{ item.product.image.url }}"
+                                    alt="{{ item.product.name }}"
+                                >
+
+                            {% else %}
+
+                                <span>
+                                    📦
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="detail-product-info">
+
+                            <p class="detail-product-category">
+
+                                {% if item.product.category %}
+                                    {{ item.product.category.name }}
+                                {% else %}
+                                    Product
+                                {% endif %}
+
+                            </p>
+
+                            <h3>
+                                {{ item.product.name }}
+                            </h3>
+
+                            <p>
+                                Quantity: {{ item.quantity }}
+                            </p>
+
+                        </div>
+
+
+                        <div class="detail-product-price">
+
+                            <span>
+                                ₹{{ item.price }} × {{ item.quantity }}
+                            </span>
+
+                            <strong>
+                                ₹{% widthratio item.price 1 item.quantity %}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- TOTAL -->
+
+                <div class="detail-total">
+
+                    <span>
+                        Order Total
+                    </span>
+
+                    <strong>
+                        ₹{{ order.total_amount }}
+                    </strong>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================= RIGHT SIDE ================= -->
+
+            <aside class="order-side-panel">
+
+
+                <!-- DELIVERY -->
+
+                <div class="delivery-card">
+
+                    <div class="side-card-heading">
+
+                        <span>
+                            📍
+                        </span>
+
+                        <div>
+
+                            <p>
+                                DELIVERY
+                            </p>
+
+                            <h2>
+                                Delivery Address
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="address-box">
+
+                        <strong>
+                            {{ order.full_name }}
+                        </strong>
+
+                        <p>
+                            {{ order.address }}
+                        </p>
+
+                        <p>
+                            {{ order.city }} - {{ order.pincode }}
+                        </p>
+
+                        <p>
+                            📞 {{ order.phone }}
+                        </p>
+
+                        <p>
+                            ✉️ {{ order.email }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PAYMENT SUMMARY -->
+
+                <div class="payment-card">
+
+                    <div class="side-card-heading">
+
+                        <span>
+                            💳
+                        </span>
+
+                        <div>
+
+                            <p>
+                                SUMMARY
+                            </p>
+
+                            <h2>
+                                Payment Details
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="payment-row">
+
+                        <span>
+                            Order Amount
+                        </span>
+
+                        <strong>
+                            ₹{{ order.total_amount }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="payment-row">
+
+                        <span>
+                            Delivery
+                        </span>
+
+                        <strong class="free-delivery">
+                            FREE
+                        </strong>
+
+                    </div>
+
+
+                    <div class="payment-row">
+                        <span>
+                            Payment Method
+                        </span>
+                        <strong>
+                            {{ order.get_payment_method_display }}
+                        </strong>
+                    </div>
+
+
+                    <div class="payment-divider"></div>
+
+
+                    <div class="payment-total">
+
+                        <span>
+                            Total Paid
+                        </span>
+
+                        <strong>
+                            ₹{{ order.total_amount }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- HELP -->
+
+                <div class="order-help">
+
+                    <span>
+                        💬
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Need Help?
+                        </strong>
+
+                        <p>
+                            Contact support if you have any
+                            questions about your order.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+            </aside>
+
+        </div>
+
+
+    </main>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div class="footer-content">
+
+            <div>
+
+                <h2>
+                    DjangoShop 🛒
+                </h2>
+
+                <p>
+                    Your simple and modern online shopping experience.
+                </p>
+
+            </div>
+
+            <div class="footer-links">
+
+                <a href="/products/">
+                    Products
+                </a>
+
+                <a href="/products/cart/">
+                    Cart
+                </a>
+
+                <a href="/products/my-orders/">
+                    Orders
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+
+            © 2026 DjangoShop. All rights reserved.
+
+        </div>
+
+    </footer>
+
+</body>
+
+</html>

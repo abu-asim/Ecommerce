@@ -1,0 +1,122 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account - DjangoShop</title>
+
+    <link rel="stylesheet" href="{% static 'products/style.css' %}">
+</head>
+
+<body class="auth-page">
+
+    <div class="auth-background">
+        <div class="auth-bubble bubble-one"></div>
+        <div class="auth-bubble bubble-two"></div>
+        <div class="auth-bubble bubble-three"></div>
+    </div>
+
+
+    <div class="auth-container">
+
+        <div class="auth-card">
+
+            <div class="auth-logo">
+                🛍️
+            </div>
+
+            <h1>Create Account</h1>
+
+            <p class="auth-subtitle">
+                Join DjangoShop and start shopping
+            </p>
+
+
+            {% if error %}
+                <div class="auth-error">
+                    ⚠️ {{ error }}
+                </div>
+            {% endif %}
+
+
+            <form method="POST" class="auth-form" autocomplete="on">
+
+                {% csrf_token %}
+
+                <div class="auth-input-group">
+
+                    <label for="username">
+                        👤 Username
+                    </label>
+
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Choose a username"
+                        maxlength="150"
+                        autocomplete="username"
+                        required
+                        autofocus
+                    >
+
+                </div>
+
+
+                <div class="auth-input-group">
+
+                    <label for="password">
+                        🔒 Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Create a password"
+                        minlength="8"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                </div>
+
+
+                <button type="submit" class="auth-submit">
+                    Create Account 🚀
+                </button>
+
+            </form>
+
+
+            <div class="auth-divider">
+                <span>OR</span>
+            </div>
+
+
+            <p class="auth-switch">
+
+                Already have an account?
+
+                <a href="{% url 'login' %}">
+                    Login
+                </a>
+
+            </p>
+
+
+            <a href="{% url 'product_list' %}" class="auth-home">
+                ← Back to Shopping
+            </a>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

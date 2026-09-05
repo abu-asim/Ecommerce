@@ -1,0 +1,186 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Order Successful - DjangoShop</title>
+
+    <link rel="stylesheet" href="{% static 'products/style.css' %}">
+</head>
+
+
+<body class="success-page">
+
+    <div class="success-background">
+        <div class="success-bubble success-bubble-one"></div>
+        <div class="success-bubble success-bubble-two"></div>
+        <div class="success-bubble success-bubble-three"></div>
+    </div>
+
+
+    <main class="success-container">
+
+        <div class="success-card">
+
+            <!-- Success Icon -->
+
+            <div class="success-icon">
+                ✓
+            </div>
+
+
+            <!-- Heading -->
+
+            <p class="success-label">
+                ORDER CONFIRMED
+            </p>
+
+            <h1>
+                🎉 Order Placed Successfully!
+            </h1>
+
+            <p class="success-message">
+                Thank you for shopping with DjangoShop,
+                <strong>{{ order.full_name }}</strong>!
+            </p>
+
+
+            <!-- Order ID -->
+
+            <div class="success-order-id">
+
+                <span>
+                    Order ID
+                </span>
+
+                <strong>
+                    #{{ order.id }}
+                </strong>
+
+            </div>
+
+
+            <!-- Order Information -->
+
+            <div class="success-info-grid">
+
+                <div class="success-info-box">
+
+                    <span class="success-info-icon">
+                        💰
+                    </span>
+
+                    <div>
+                        <small>Total Amount</small>
+                        <strong>₹{{ order.total_amount }}</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="success-info-box">
+
+                    <span class="success-info-icon">
+                        📅
+                    </span>
+
+                    <div>
+                        <small>Order Date</small>
+                        <strong>{{ order.created_at|date:"d M Y" }}</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Delivery -->
+
+            <div class="success-delivery">
+
+                <div class="success-section-heading">
+                    🚚 Delivery Details
+                </div>
+
+                <div class="success-address">
+
+                    <strong>
+                        {{ order.full_name }}
+                    </strong>
+
+                    <p>
+                        {{ order.address }}
+                    </p>
+
+                    <p>
+                        {{ order.city }} - {{ order.pincode }}
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- Status -->
+
+            <div class="success-status">
+
+                <span class="status-check">
+                    ✓
+                </span>
+
+                <div>
+                    <strong>Order received</strong>
+
+                    <small>
+                        We'll start processing your order soon.
+                    </small>
+                </div>
+
+            </div>
+
+
+            <!-- Buttons -->
+
+            <div class="success-actions">
+
+                <a
+                    href="/products/"
+                    class="success-shopping-btn"
+                >
+                    🛍️ Continue Shopping
+                </a>
+
+
+                <a
+                    href="/products/my-orders/"
+                    class="success-orders-btn"
+                >
+                    📦 View My Orders
+                </a>
+
+            </div>
+
+
+            <p class="success-thank-you">
+                Thank you for choosing DjangoShop ❤️
+            </p>
+
+        </div>
+
+    </main>
+
+
+    <footer class="success-footer">
+
+        © 2026 DjangoShop — Made with ❤️ using Django
+
+    </footer>
+
+</body>
+
+</html>

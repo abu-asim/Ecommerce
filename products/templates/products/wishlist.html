@@ -1,0 +1,268 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>My Wishlist - DjangoShop</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'products/style.css' %}"
+    >
+</head>
+
+
+<body>
+
+    <!-- NAVBAR -->
+
+    <nav class="wishlist-navbar">
+
+        <div class="wishlist-brand">
+            <a href="/products/">
+                🛒 DjangoShop
+            </a>
+        </div>
+
+
+        <div class="wishlist-nav-links">
+
+            <a href="/products/">
+                Products
+            </a>
+
+            <a href="/products/cart/">
+                🛒 My Cart
+            </a>
+
+            <a href="/products/my-orders/">
+                📦 My Orders
+            </a>
+
+            <form
+               method="POST"
+               action="{% url 'logout' %}">
+               {% csrf_token %}
+
+               <button
+                  type="submit"
+                  class="logout-link">
+                    Logout
+                </button>
+            </form>
+
+        </div>
+
+    </nav>
+
+
+    <!-- PAGE -->
+
+    <main class="wishlist-page">
+
+        <div class="wishlist-header">
+
+            <div>
+
+                <p class="wishlist-label">
+                    YOUR COLLECTION
+                </p>
+
+                <h1>
+                    ❤️ My Wishlist
+                </h1>
+
+                <p>
+                    Products you've saved for later.
+                </p>
+
+            </div>
+
+            <a
+                href="/products/"
+                class="wishlist-shop-btn"
+            >
+                🛍️ Continue Shopping
+            </a>
+
+        </div>
+
+
+        {% if wishlist_items %}
+
+            <div class="wishlist-grid">
+
+                {% for item in wishlist_items %}
+
+                    <div class="wishlist-card">
+
+
+                        <!-- IMAGE -->
+
+                        <div class="wishlist-image">
+
+                            {% if item.product.image %}
+
+                                <img
+                                    src="{{ item.product.image.url }}"
+                                    alt="{{ item.product.name }}"
+                                >
+
+                            {% else %}
+
+                                <div class="wishlist-no-image">
+                                    🛍️
+                                </div>
+
+                            {% endif %}
+
+
+                            <div class="wishlist-heart">
+                                ❤️
+                            </div>
+
+                        </div>
+
+
+                        <!-- INFO -->
+
+                        <div class="wishlist-info">
+
+                            {% if item.product.category %}
+
+                                <span class="wishlist-category">
+                                    {{ item.product.category.name }}
+                                </span>
+
+                            {% endif %}
+
+
+                            <h2>
+                                {{ item.product.name }}
+                            </h2>
+
+
+                            <p class="wishlist-description">
+                                {{ item.product.discription|truncatechars:70 }}
+                            </p>
+
+
+                            <div class="wishlist-bottom">
+
+                                <strong class="wishlist-price">
+                                    ₹{{ item.product.price }}
+                                </strong>
+
+
+                                {% if item.product.stock == 0 %}
+
+                                    <span class="wishlist-stock out">
+                                        Out of Stock
+                                    </span>
+
+                                {% elif item.product.stock <= 5 %}
+
+                                    <span class="wishlist-stock low">
+                                        Only {{ item.product.stock }} left
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="wishlist-stock available">
+                                        In Stock
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <!-- ACTIONS -->
+
+                            <div class="wishlist-actions">
+
+                                <a
+                                    href="{% url 'product_detail' item.product.id %}"
+                                    class="wishlist-view-btn"
+                                >
+                                    View Product
+                                </a>
+
+
+                                <form
+                                  method="POST"
+                                   action="{% url 'toggle_wishlist' item.product.id %}"
+                                     style="display: inline;"
+                                       >
+                                  {% csrf_token %}
+
+                                 <button
+                                  type="submit"
+                                     class="wishlist-remove-btn"
+                                      >
+                                      ❤️ Remove
+                                  </button>
+                                   </form>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+        {% else %}
+
+            <!-- EMPTY -->
+
+            <div class="wishlist-empty">
+
+                <div class="wishlist-empty-icon">
+                    💔
+                </div>
+
+                <h2>
+                    Your Wishlist is Empty
+                </h2>
+
+                <p>
+                    Save products you love and find them here later.
+                </p>
+
+                <a
+                    href="/products/"
+                    class="wishlist-empty-btn"
+                >
+                    🛍️ Explore Products
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </main>
+
+
+    <footer class="wishlist-footer">
+
+        <p>
+            © 2026 DjangoShop — Made with ❤️ using Django
+        </p>
+
+    </footer>
+
+</body>
+
+</html>

@@ -1,0 +1,317 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Profile | DjangoShop</title>
+
+    <link rel="stylesheet" href="{% static 'products/style.css' %}">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+
+    <nav class="profile-navbar">
+
+        <div class="profile-brand">
+            🛒 DjangoShop
+        </div>
+
+        <div class="profile-nav-links">
+
+            <a href="{% url 'product_list' %}">
+                🏠 Products
+            </a>
+
+            <a href="{% url 'cart' %}">
+                🛒 Cart
+            </a>
+
+            <a href="{% url 'wishlist' %}">
+                ❤️ Wishlist
+            </a>
+
+            <a href="{% url 'my_orders' %}">
+                📦 My Orders
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- PROFILE PAGE -->
+
+    <main class="profile-page">
+
+        <div class="profile-header">
+
+            <span class="profile-label">
+                ACCOUNT CENTER
+            </span>
+
+            <h1>
+                My Profile 👤
+            </h1>
+
+            <p>
+                Manage your personal information and delivery address.
+            </p>
+
+        </div>
+
+
+        <div class="profile-layout">
+
+
+            <!-- PROFILE CARD -->
+
+            <section class="profile-card">
+
+                <div class="profile-avatar">
+                    {{ user.username|first|upper }}
+                </div>
+
+                <h2>
+                    {{ user.username }}
+                </h2>
+
+                <p class="profile-member">
+                    DjangoShop Customer
+                </p>
+
+                <div class="profile-divider"></div>
+
+                <div class="profile-info">
+
+                    <div>
+                        <span>👤 Username</span>
+                        <strong>{{ user.username }}</strong>
+                    </div>
+
+                    <div>
+                        <span>📧 Email</span>
+
+                        {% if user.email %}
+                            <strong>{{ user.email }}</strong>
+                        {% else %}
+                            <strong>Not added</strong>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- EDIT PROFILE -->
+
+            <section class="profile-form-card">
+
+                <div class="profile-form-heading">
+
+                    <div>
+                        <span class="profile-label">
+                            PERSONAL DETAILS
+                        </span>
+
+                        <h2>
+                            Edit Profile ✏️
+                        </h2>
+                    </div>
+
+                </div>
+
+
+                <form method="POST" autocomplete="on">
+
+                    {% csrf_token %}
+
+                    <!-- FULL NAME -->
+
+                    <div class="profile-form-group">
+
+                        <label for="full_name">
+                            👤 Full Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="full_name"
+                            name="full_name"
+                            value="{{ profile.full_name }}"
+                            placeholder="Enter your full name"
+                            maxlength="200"
+                            autocomplete="name"
+                        >
+
+                    </div>
+
+
+                    <!-- EMAIL -->
+
+                    <div class="profile-form-group">
+
+                        <label for="email">
+                            📧 Email Address
+                        </label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value="{{ user.email }}"
+                            placeholder="Enter your email"
+                            maxlength="254"
+                            autocomplete="email"
+                        >
+
+                    </div>
+
+
+                    <!-- PHONE -->
+
+                    <div class="profile-form-group">
+
+                        <label for="phone">
+                            📱 Phone Number
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="phone"
+                            name="phone"
+                            value="{{ profile.phone }}"
+                            placeholder="10-digit mobile number"
+                            maxlength="10"
+                            minlength="10"
+                            pattern="[6-9][0-9]{9}"
+                            inputmode="numeric"
+                            autocomplete="tel"
+                        >
+
+                    </div>
+
+
+                    <!-- ADDRESS -->
+
+                    <div class="profile-form-group">
+
+                        <label for="address">
+                            🏠 Delivery Address
+                        </label>
+
+                        <textarea
+                            id="address"
+                            name="address"
+                            rows="4"
+                            maxlength="5000"
+                            placeholder="Enter your complete address"
+                            autocomplete="street-address"
+                        >{{ profile.address }}</textarea>
+
+                    </div>
+
+
+                    <!-- CITY + PINCODE -->
+
+                    <div class="profile-form-row">
+
+                        <div class="profile-form-group">
+
+                            <label for="city">
+                                🏙️ City
+                            </label>
+
+                            <input
+                                type="text"
+                                id="city"
+                                name="city"
+                                value="{{ profile.city }}"
+                                placeholder="Enter city"
+                                maxlength="100"
+                                autocomplete="address-level2"
+                            >
+
+                        </div>
+
+
+                        <div class="profile-form-group">
+
+                            <label for="pincode">
+                                📮 Pincode
+                            </label>
+
+                            <input
+                                type="text"
+                                id="pincode"
+                                name="pincode"
+                                value="{{ profile.pincode }}"
+                                placeholder="6-digit pincode"
+                                maxlength="6"
+                                minlength="6"
+                                pattern="[1-9][0-9]{5}"
+                                inputmode="numeric"
+                                autocomplete="postal-code"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="save-profile-btn"
+                    >
+                        💾 Save Changes
+                    </button>
+
+                </form>
+
+            </section>
+
+        </div>
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <footer class="profile-footer">
+
+        <h3>
+            🛒 DjangoShop
+        </h3>
+
+        <p>
+            Your favorite products, delivered to your doorstep.
+        </p>
+
+        <div>
+
+            <a href="{% url 'product_list' %}">
+                Products
+            </a>
+
+            <a href="{% url 'wishlist' %}">
+                Wishlist
+            </a>
+
+            <a href="{% url 'my_orders' %}">
+                Orders
+            </a>
+
+        </div>
+
+    </footer>
+
+</body>
+
+</html>

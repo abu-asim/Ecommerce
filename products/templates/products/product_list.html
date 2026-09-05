@@ -1,0 +1,797 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>DjangoShop - Products</title>
+
+    <!-- FIXED: duplicate "link" removed -->
+    <link
+        rel="stylesheet"
+        href="{% static 'products/style.css' %}"
+    >
+
+</head>
+
+
+<body>
+
+    <!-- =====================================================
+         NAVBAR
+    ====================================================== -->
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+
+            <!-- BRAND -->
+
+            <a
+                href="{% url 'product_list' %}"
+                class="brand"
+            >
+                DjangoShop <span>🛒</span>
+            </a>
+
+
+            <!-- NAV LINKS -->
+
+            <div class="nav-links">
+
+                <a href="{% url 'product_list' %}">
+                    Products
+                </a>
+
+
+                {% if user.is_authenticated %}
+
+                    <a href="/products/my-orders/">
+                        My Orders
+                    </a>
+
+
+                    <a
+                        href="/products/cart/"
+                        class="cart-link"
+                    >
+                        🛒 My Cart
+                    </a>
+
+
+                    <form
+                       method="POST"
+                       action="{% url 'logout' %}"
+                       {% csrf_token %}>
+
+                       <button
+                          type="submit"
+                          class="logout-link"
+                          >
+                          Logout
+                       </button>
+                    </form>
+
+
+                    <a href="{% url 'wishlist' %}">
+                        ❤️ Wishlist
+                    </a>
+
+                    <a href="{% url 'profile' %}">
+                         <button type="button">👤 My Profile</button>
+                    </a>
+
+
+                {% else %}
+
+                    <a href="/products/login/">
+                        Login
+                    </a>
+
+
+                    <a
+                        href="/products/register/"
+                        class="register-link"
+                    >
+                        Register
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main>
+
+
+        <!-- =================================================
+             HERO
+        ================================================== -->
+
+        <section class="hero">
+
+            <div class="hero-content">
+
+
+                {% if user.is_authenticated %}
+
+                    <p class="welcome-text">
+                        Welcome back, {{ user.username }} 👋
+                    </p>
+
+                {% else %}
+
+                    <p class="welcome-text">
+                        Welcome to DjangoShop 👋
+                    </p>
+
+                {% endif %}
+
+
+                <h1>
+
+                    Discover Something<br>
+
+                    <span>
+                        You'll Love.
+                    </span>
+
+                </h1>
+
+
+                <p class="hero-description">
+
+                    Explore our collection of quality products
+                    at amazing prices.
+
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             SEARCH & SORT
+        ================================================== -->
+
+        <section class="shop-controls">
+
+
+            <!-- SEARCH -->
+
+            <div class="search-box">
+
+                {% if category %}
+
+                    <form
+                        method="GET"
+                        action="/products/category/{{ category.slug }}/"
+                    >
+
+                {% else %}
+
+                    <form
+                        method="GET"
+                        action="/products/"
+                    >
+
+                {% endif %}
+
+
+                    <span class="search-icon">
+                        🔍
+                    </span>
+
+
+                    <input
+                        type="text"
+                        name="q"
+                        placeholder="Search for products..."
+                        value="{{ query }}"
+                    >
+
+
+                    <button type="submit">
+                        Search
+                    </button>
+
+
+                </form>
+
+            </div>
+
+
+
+            <!-- SORT -->
+
+            <div class="sort-box">
+
+                <form
+                    method="GET"
+                    action="{% if category %}/products/category/{{ category.slug }}/{% else %}/products/{% endif %}"
+                >
+
+
+                    <input
+                        type="hidden"
+                        name="q"
+                        value="{{ query }}"
+                    >
+
+
+                    <label for="sort">
+                        Sort by
+                    </label>
+
+
+                    <select
+                        name="sort"
+                        id="sort"
+                    >
+
+                        <option
+                            value=""
+                            {% if not sort %}selected{% endif %}
+                        >
+                            Default
+                        </option>
+
+
+                        <option
+                            value="price_low"
+                            {% if sort == 'price_low' %}selected{% endif %}
+                        >
+                            Price: Low to High
+                        </option>
+
+
+                        <option
+                            value="price_high"
+                            {% if sort == 'price_high' %}selected{% endif %}
+                        >
+                            Price: High to Low
+                        </option>
+
+
+                        <option
+                            value="newest"
+                            {% if sort == 'newest' %}selected{% endif %}
+                        >
+                            Newest First
+                        </option>
+
+                    </select>
+
+
+                    <button type="submit">
+                        Apply
+                    </button>
+
+
+                </form>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             CATEGORIES
+        ================================================== -->
+
+        <section class="category-section">
+
+
+            <div class="section-heading">
+
+                <h2>
+                    Shop by Category
+                </h2>
+
+            </div>
+
+
+            <div class="categories">
+
+
+                <a
+                    href="{% url 'product_list' %}"
+                    class="{% if not category %}active{% endif %}"
+                >
+                    All Products
+                </a>
+
+
+                {% for category_item in categories %}
+
+                    <a
+                        href="/products/category/{{ category_item.slug }}/"
+                        class="{% if category and category.slug == category_item.slug %}active{% endif %}"
+                    >
+                        {{ category_item.name }}
+                    </a>
+
+                {% endfor %}
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             PRODUCTS
+        ================================================== -->
+
+        <section class="products-section">
+
+
+            <!-- PRODUCTS HEADER -->
+
+            <div class="products-header">
+
+
+                <div>
+
+                    {% if category %}
+
+                        <p class="section-label">
+                            CATEGORY
+                        </p>
+
+
+                        <h2>
+                            {{ category.name }}
+                        </h2>
+
+
+                    {% else %}
+
+                        <p class="section-label">
+                            OUR COLLECTION
+                        </p>
+
+
+                        <h2>
+                            All Products
+                        </h2>
+
+                    {% endif %}
+
+                </div>
+
+
+                <span class="product-count">
+                    {{ products.paginator.count }} Products
+                </span>
+
+
+            </div>
+
+
+
+            <!-- PRODUCT GRID -->
+
+            <div class="product-grid">
+
+
+                {% for product in products %}
+
+
+                    <article class="product-card">
+
+
+                        <!-- =================================
+                             PRODUCT IMAGE
+                        ================================== -->
+
+                        <a
+                            href="{% url 'product_detail' product.id %}"
+                            class="product-image"
+                        >
+
+
+                            {% if product.image %}
+
+                                <img
+                                    src="{{ product.image.url }}"
+                                    alt="{{ product.name }}"
+                                >
+
+                            {% else %}
+
+                                <div class="no-image">
+
+                                    <span>
+                                        📦
+                                    </span>
+
+                                    <p>
+                                        No Image
+                                    </p>
+
+                                </div>
+
+                            {% endif %}
+
+
+
+                            <!-- STOCK BADGE -->
+
+                            {% if product.stock == 0 %}
+
+                                <span
+                                    class="product-badge sold-out"
+                                >
+                                    Sold Out
+                                </span>
+
+
+                            {% elif product.stock <= 5 %}
+
+                                <span
+                                    class="product-badge limited"
+                                >
+                                    Limited Stock
+                                </span>
+
+
+                            {% else %}
+
+                                <span
+                                    class="product-badge available"
+                                >
+                                    In Stock
+                                </span>
+
+                            {% endif %}
+
+
+                        </a>
+
+
+
+                        <!-- =================================
+                             WISHLIST BUTTON ❤️
+                        ================================== -->
+
+                        {% if user.is_authenticated %}
+
+                            <form
+                               method="POST"
+                               action="{% url 'toggle_wishlist' product.id %}"
+                               class="wishlist-form">
+                               {% csrf_token %}
+
+                              <button
+                                type="submit"
+                                 class="product-wishlist-btn"
+                                 title="Add to Wishlist"
+                                 aria-label="Add {{ product.name }} to wishlist">
+                                      ❤️
+                                 </button>
+                            </form>
+
+                        {% endif %}
+
+
+
+                        <!-- =================================
+                             PRODUCT INFO
+                        ================================== -->
+
+                        <div class="product-info">
+
+
+                            <!-- CATEGORY -->
+
+                            <p class="product-category">
+
+                                {% if product.category %}
+
+                                    {{ product.category.name }}
+
+                                {% else %}
+
+                                    Uncategorized
+
+                                {% endif %}
+
+                            </p>
+
+
+
+                            <!-- NAME -->
+
+                            <h3 class="product-name">
+
+                                {{ product.name }}
+
+                            </h3>
+
+
+
+                            <!-- DESCRIPTION -->
+
+                            <p class="product-description">
+
+                                {{ product.discription|truncatechars:80 }}
+
+                            </p>
+
+
+
+                            <!-- PRICE + VIEW -->
+
+                            <div class="product-bottom">
+
+
+                                <div>
+
+                                    <p class="price-label">
+                                        Price
+                                    </p>
+
+
+                                    <h3 class="product-price">
+                                        ₹{{ product.price }}
+                                    </h3>
+
+                                </div>
+
+
+
+                                <a
+                                    href="{% url 'product_detail' product.id %}"
+                                    class="details-btn"
+                                >
+                                    View
+                                </a>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    </article>
+
+
+                {% empty %}
+
+
+                    <!-- EMPTY PRODUCTS -->
+
+                    <div class="empty-products">
+
+
+                        <div class="empty-icon">
+                            🔍
+                        </div>
+
+
+                        <h2>
+                            No products found
+                        </h2>
+
+
+                        <p>
+                            Try searching for something else.
+                        </p>
+
+
+                        <a href="{% url 'product_list' %}">
+                            View All Products
+                        </a>
+
+
+                    </div>
+
+
+                {% endfor %}
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             PAGINATION
+        ================================================== -->
+
+        {% if products.has_other_pages %}
+
+
+            <div class="pagination">
+
+
+                <!-- PREVIOUS -->
+
+                {% if products.has_previous %}
+
+
+                    {% if category %}
+
+                        <a
+                            href="/products/category/{{ category.slug }}/?page={{ products.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}"
+                            class="page-btn"
+                        >
+                            ← Previous
+                        </a>
+
+
+                    {% else %}
+
+                        <a
+                            href="/products/?page={{ products.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}"
+                            class="page-btn"
+                        >
+                            ← Previous
+                        </a>
+
+                    {% endif %}
+
+
+                {% endif %}
+
+
+
+                <!-- CURRENT PAGE -->
+
+                <div class="page-number">
+
+                    <span>
+                        Page
+                    </span>
+
+
+                    <strong>
+                        {{ products.number }}
+                    </strong>
+
+
+                    <span>
+                        of {{ products.paginator.num_pages }}
+                    </span>
+
+                </div>
+
+
+
+                <!-- NEXT -->
+
+                {% if products.has_next %}
+
+
+                    {% if category %}
+
+                        <a
+                            href="/products/category/{{ category.slug }}/?page={{ products.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}"
+                            class="page-btn"
+                        >
+                            Next →
+                        </a>
+
+
+                    {% else %}
+
+                        <a
+                            href="/products/?page={{ products.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}"
+                            class="page-btn"
+                        >
+                            Next →
+                        </a>
+
+                    {% endif %}
+
+
+                {% endif %}
+
+
+            </div>
+
+
+        {% endif %}
+
+
+    </main>
+
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer>
+
+
+        <div class="footer-content">
+
+
+            <div>
+
+                <h2>
+                    DjangoShop 🛒
+                </h2>
+
+
+                <p>
+                    Your simple and modern online shopping experience.
+                </p>
+
+            </div>
+
+
+
+            <div class="footer-links">
+
+
+                <a href="{% url 'product_list' %}">
+                    Products
+                </a>
+
+
+                {% if user.is_authenticated %}
+
+                    <a href="/products/cart/">
+                        Cart
+                    </a>
+
+
+                    <a href="/products/my-orders/">
+                        Orders
+                    </a>
+
+
+                    <a href="{% url 'wishlist' %}">
+                        Wishlist ❤️
+                    </a>
+
+                {% endif %}
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <div class="footer-bottom">
+
+            © 2026 DjangoShop. All rights reserved.
+
+        </div>
+
+
+    </footer>
+
+
+</body>
+
+</html>

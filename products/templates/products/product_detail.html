@@ -1,0 +1,797 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ product.name }} - DjangoShop</title>
+
+    <link rel="stylesheet" href="{% static 'products/style.css' %}">
+</head>
+
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+
+    <nav class="detail-navbar">
+
+        <div class="detail-brand">
+            <a href="/products/">
+                🛒 DjangoShop
+            </a>
+        </div>
+
+
+        <div class="detail-nav-links">
+
+            <a href="/products/">
+                Products
+            </a>
+
+            {% if user.is_authenticated %}
+
+                <a href="/products/cart/">
+                    🛒 My Cart
+                </a>
+
+                <a href="/products/my-orders/">
+                    📦 My Orders
+                </a>
+
+                <form
+                  method="POST"
+                  action="{% url 'logout' %}">
+                  {% csrf_token %}
+
+                  <button
+                    type="submit"
+                    class="logout-link">
+                   Logout
+                  </button>
+                </form>
+
+            {% else %}
+
+                <a href="/products/login/">
+                    Login
+                </a>
+
+                <a href="/products/register/">
+                    Register
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    </nav>
+
+
+
+    <!-- ================= PRODUCT DETAIL ================= -->
+
+    <main class="product-detail-page">
+
+        <div class="product-detail-container">
+
+
+            <!-- ================= IMAGE SECTION ================= -->
+
+            <div class="detail-image-card">
+
+                <div class="detail-image-glow"></div>
+
+                {% if product.image %}
+
+                    <img
+                        src="{{ product.image.url }}"
+                        alt="{{ product.name }}"
+                        class="detail-product-image"
+                    >
+
+                {% else %}
+
+                    <div class="detail-no-image">
+                        🛍️
+                        <span>No Image Available</span>
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+
+            <!-- ================= INFO SECTION ================= -->
+
+            <div class="detail-info-card">
+
+
+                <!-- Category -->
+
+                <div class="detail-category">
+                    🏷️ {{ product.category.name }}
+                </div>
+
+
+                <!-- Product Name -->
+
+                <h1 class="detail-product-title">
+                    {{ product.name }}
+                </h1>
+
+
+                <!-- Rating -->
+
+                <div class="detail-rating">
+
+                    <span class="stars">
+                        ★★★★★
+                    </span>
+
+                    <span>
+                        Premium Product
+                    </span>
+
+                </div>
+
+
+                <!-- Price -->
+
+                <div class="detail-price">
+
+                    <span class="currency">₹</span>{{ product.price }}
+
+                </div>
+
+
+                <!-- Description -->
+
+                <div class="detail-description">
+
+                    <h3>
+                        About this product
+                    </h3>
+
+                    <p>
+                        {{ product.discription }}
+                    </p>
+
+                </div>
+
+
+
+                <!-- ================= STOCK ================= -->
+
+                <div class="detail-stock-box">
+
+                    {% if product.stock == 0 %}
+
+                        <div class="stock-status out-stock">
+                            ❌ Out of Stock
+                        </div>
+
+                    {% elif product.stock <= 5 %}
+
+                        <div class="stock-status only-few">
+                            ⚠️ Only {{ product.stock }} left!
+                        </div>
+
+                    {% else %}
+
+                        <div class="stock-status in-stock">
+                            ✅ In Stock
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+
+                <!-- ================= WISHLIST ================= -->
+
+                {% if user.is_authenticated %}
+
+                    <form
+                        method="POST"
+                        action="{% url 'toggle_wishlist' product.id %}"
+                    >
+
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="detail-wishlist-btn"
+                        >
+                            ❤️ Add to Wishlist
+                        </button>
+
+                    </form>
+
+                {% endif %}
+
+                <br><br>
+
+
+
+                <!-- ================= ADD TO CART ================= -->
+
+                <div class="detail-actions">
+
+                    {% if product.stock == 0 %}
+
+                        <button
+                            type="button"
+                            class="detail-cart-btn disabled-cart"
+                            disabled
+                        >
+                            Out of Stock
+                        </button>
+
+
+                    {% elif user.is_authenticated %}
+
+                        <!-- POST + CSRF SECURED ADD TO CART -->
+
+                        <form
+                            method="POST"
+                            action="{% url 'add_to_cart' product.id %}"
+                            class="detail-cart-link"
+                        >
+
+                            {% csrf_token %}
+
+                            <button
+                                type="submit"
+                                class="detail-cart-btn"
+                            >
+                                🛒 Add to Cart
+                            </button>
+
+                        </form>
+
+
+                    {% else %}
+
+                        <a
+                            href="/products/login/"
+                            class="detail-cart-link"
+                        >
+
+                            <button
+                                type="button"
+                                class="detail-cart-btn"
+                            >
+                                🔐 Login to Add to Cart
+                            </button>
+
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+
+
+                <!-- ================= TRUST FEATURES ================= -->
+
+                <div class="detail-features">
+
+                    <div class="detail-feature">
+
+                        <span class="feature-icon">
+                            🚚
+                        </span>
+
+                        <div>
+                            <strong>Fast Delivery</strong>
+                            <small>Quick & reliable shipping</small>
+                        </div>
+
+                    </div>
+
+
+                    <div class="detail-feature">
+
+                        <span class="feature-icon">
+                            🔒
+                        </span>
+
+                        <div>
+                            <strong>Secure Shopping</strong>
+                            <small>Your data is protected</small>
+                        </div>
+
+                    </div>
+
+
+                    <div class="detail-feature">
+
+                        <span class="feature-icon">
+                            💯
+                        </span>
+
+                        <div>
+                            <strong>Quality Product</strong>
+                            <small>Shop with confidence</small>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ================= BACK ================= -->
+
+                <a
+                    href="/products/"
+                    class="detail-back"
+                >
+                    ← Continue Shopping
+                </a>
+
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =====================================================
+             RATINGS & REVIEWS
+        ====================================================== -->
+
+        <section class="reviews-section">
+
+            <div class="reviews-header">
+
+                <div>
+
+                    <span class="reviews-label">
+                        CUSTOMER FEEDBACK
+                    </span>
+
+                    <h2>
+                        Reviews & Ratings ⭐
+                    </h2>
+
+                    <p>
+                        See what other customers think about this product.
+                    </p>
+
+                </div>
+
+
+                {% if reviews %}
+
+                    <div class="rating-summary">
+
+                        <div class="big-rating">
+                            {{ average_rating|floatformat:1 }}
+                        </div>
+
+                        <div>
+
+                            <div class="rating-stars">
+
+                                {% if average_rating >= 1 %}
+                                    ★
+                                {% else %}
+                                    ☆
+                                {% endif %}
+
+                                {% if average_rating >= 2 %}
+                                    ★
+                                {% else %}
+                                    ☆
+                                {% endif %}
+
+                                {% if average_rating >= 3 %}
+                                    ★
+                                {% else %}
+                                    ☆
+                                {% endif %}
+
+                                {% if average_rating >= 4 %}
+                                    ★
+                                {% else %}
+                                    ☆
+                                {% endif %}
+
+                                {% if average_rating >= 5 %}
+                                    ★
+                                {% else %}
+                                    ☆
+                                {% endif %}
+
+                            </div>
+
+                            <span>
+                                {{ reviews|length }}
+                                review{{ reviews|length|pluralize }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+
+            <!-- ================= REVIEW FORM ================= -->
+
+            {% if user.is_authenticated %}
+
+                <div class="review-form-card">
+
+                    <h3>
+
+                        {% if user_review %}
+                            ✏️ Update Your Review
+                        {% else %}
+                            ✍️ Write a Review
+                        {% endif %}
+
+                    </h3>
+
+
+                    <form
+                        method="POST"
+                        action="{% url 'add_review' product.id %}"
+                    >
+
+                        {% csrf_token %}
+
+
+                        <label>
+                            Rating
+                        </label>
+
+
+                        <div class="rating-select">
+
+                            <select
+                                name="rating"
+                                required
+                            >
+
+                                <option value="">
+                                    Choose rating
+                                </option>
+
+
+                                <option
+                                    value="5"
+                                    {% if user_review.rating == 5 %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    ⭐⭐⭐⭐⭐ — Excellent
+                                </option>
+
+
+                                <option
+                                    value="4"
+                                    {% if user_review.rating == 4 %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    ⭐⭐⭐⭐ — Very Good
+                                </option>
+
+
+                                <option
+                                    value="3"
+                                    {% if user_review.rating == 3 %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    ⭐⭐⭐ — Good
+                                </option>
+
+
+                                <option
+                                    value="2"
+                                    {% if user_review.rating == 2 %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    ⭐⭐ — Average
+                                </option>
+
+
+                                <option
+                                    value="1"
+                                    {% if user_review.rating == 1 %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    ⭐ — Poor
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <label>
+                            Comment
+                        </label>
+
+
+                        <textarea
+                            name="comment"
+                            rows="5"
+                            placeholder="Tell us about your experience..."
+                            required
+                        >{% if user_review %}{{ user_review.comment }}{% endif %}</textarea>
+
+
+                        <button
+                            type="submit"
+                            class="submit-review-btn"
+                        >
+
+                            {% if user_review %}
+                                🔄 Update Review
+                            {% else %}
+                                ⭐ Submit Review
+                            {% endif %}
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+
+            {% else %}
+
+                <div class="login-review-box">
+
+                    🔐 Please
+
+                    <a href="{% url 'login' %}">
+                        login
+                    </a>
+
+                    to write a review.
+
+                </div>
+
+            {% endif %}
+
+
+
+            <!-- ================= REVIEWS LIST ================= -->
+
+            <div class="reviews-list">
+
+                {% if reviews %}
+
+                    {% for review in reviews %}
+
+                        <div class="review-card">
+
+                            <div class="review-card-top">
+
+                                <div class="review-user">
+
+                                    <div class="review-avatar">
+                                        {{ review.user.username|first|upper }}
+                                    </div>
+
+
+                                    <div>
+
+                                        <h4>
+                                            {{ review.user.username }}
+                                        </h4>
+
+                                        <small>
+                                            {{ review.created_at|date:"d M Y" }}
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="review-rating">
+
+                                    {% if review.rating >= 1 %}
+                                        ★
+                                    {% endif %}
+
+                                    {% if review.rating >= 2 %}
+                                        ★
+                                    {% endif %}
+
+                                    {% if review.rating >= 3 %}
+                                        ★
+                                    {% endif %}
+
+                                    {% if review.rating >= 4 %}
+                                        ★
+                                    {% endif %}
+
+                                    {% if review.rating >= 5 %}
+                                        ★
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+
+                            <p class="review-comment">
+                                {{ review.comment }}
+                            </p>
+
+                        </div>
+
+                    {% endfor %}
+
+
+                {% else %}
+
+                    <div class="no-reviews">
+
+                        <div>
+                            💬
+                        </div>
+
+                        <h3>
+                            No reviews yet
+                        </h3>
+
+                        <p>
+                            Be the first person to review this product!
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             RECENTLY VIEWED
+        ====================================================== -->
+
+        {% if recent_products %}
+
+            <section class="recently-viewed-section">
+
+                <div class="recently-viewed-header">
+
+                    <div>
+
+                        <span class="recently-viewed-label">
+                            YOUR BROWSING HISTORY
+                        </span>
+
+                        <h2>
+                            Recently Viewed 🕒
+                        </h2>
+
+                        <p>
+                            Products you viewed recently.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="recently-viewed-grid">
+
+                    {% for recent_product in recent_products %}
+
+                        <div class="recent-product-card">
+
+
+                            <!-- IMAGE -->
+
+                            <a
+                                href="{% url 'product_detail' recent_product.id %}"
+                                class="recent-product-image"
+                            >
+
+                                {% if recent_product.image %}
+
+                                    <img
+                                        src="{{ recent_product.image.url }}"
+                                        alt="{{ recent_product.name }}"
+                                    >
+
+                                {% else %}
+
+                                    <span>
+                                        📦
+                                    </span>
+
+                                {% endif %}
+
+                            </a>
+
+
+
+                            <!-- INFO -->
+
+                            <div class="recent-product-info">
+
+
+                                {% if recent_product.category %}
+
+                                    <span class="recent-product-category">
+                                        {{ recent_product.category.name }}
+                                    </span>
+
+                                {% endif %}
+
+
+                                <h3>
+                                    {{ recent_product.name }}
+                                </h3>
+
+
+                                <div class="recent-product-bottom">
+
+                                    <strong>
+                                        ₹{{ recent_product.price }}
+                                    </strong>
+
+
+                                    <a
+                                        href="{% url 'product_detail' recent_product.id %}"
+                                        class="recent-view-btn"
+                                    >
+                                        View →
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </section>
+
+        {% endif %}
+
+    </main>
+
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer class="detail-footer">
+
+        <p>
+            © 2026 DjangoShop — Made with ❤️ using Django
+        </p>
+
+    </footer>
+
+
+</body>
+
+</html>

@@ -1,0 +1,260 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Cart</title>
+    <link rel="stylesheet" href="{% static 'products/style.css' %}">
+    
+</head>
+
+<body>
+
+<div class="navbar">
+
+    <h2>🛍️ DjangoShop</h2>
+
+    <div class="nav-links">
+
+        <a href="{% url 'product_list' %}">
+            Home
+        </a>
+
+        <a href="{% url 'cart' %}">
+            🛒 Cart
+        </a>
+
+        {% if user.is_authenticated %}
+
+            <span>
+                Hi, {{ user.username }}
+            </span>
+
+            <!-- Secure POST Logout -->
+            <form method="POST" action="{% url 'logout' %}">
+
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="logout-btn"
+                >
+                    Logout
+                </button>
+
+            </form>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<div class="container">
+
+    <div class="title">
+
+        <h1>
+            🛒 My Cart
+        </h1>
+
+        <p>
+            Review your items before checkout
+        </p>
+
+    </div>
+
+
+    {% if cart_items %}
+
+        {% for item in cart_items %}
+
+        <div class="cart-card">
+
+
+            <!-- ================= PRODUCT ================= -->
+
+            <div class="product-info">
+
+                {% if item.product.image %}
+
+                    <img
+                        src="{{ item.product.image.url }}"
+                        alt="{{ item.product.name }}"
+                    >
+
+                {% endif %}
+
+
+                <div>
+
+                    <div class="product-name">
+                        {{ item.product.name }}
+                    </div>
+
+                    <div class="product-price">
+                        ₹{{ item.product.price }}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ================= QUANTITY ================= -->
+
+            <div class="quantity-section">
+
+
+                <!-- DECREASE -->
+
+                <form
+                    method="POST"
+                    action="{% url 'decrease_quantity' item.id %}"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="quantity-btn"
+                        aria-label="Decrease quantity"
+                    >
+                        −
+                    </button>
+
+                </form>
+
+
+                <span class="quantity">
+                    {{ item.quantity }}
+                </span>
+
+
+                <!-- INCREASE -->
+
+                <form
+                    method="POST"
+                    action="{% url 'increase_quantity' item.id %}"
+                >
+
+                    {% csrf_token %}
+
+                    {% if item.quantity < item.product.stock %}
+
+                        <button
+                            type="submit"
+                            class="quantity-btn"
+                            aria-label="Increase quantity"
+                        >
+                            +
+                        </button>
+
+                    {% else %}
+
+                        <button
+                            type="button"
+                            class="quantity-btn"
+                            disabled
+                            title="Maximum available stock reached"
+                            aria-label="Maximum available stock reached"
+                        >
+                            +
+                        </button>
+
+                    {% endif %}
+
+                </form>
+
+            </div>
+
+
+
+            <!-- ================= ITEM TOTAL ================= -->
+
+            <div class="item-total">
+
+                ₹{{ item.subtotal }}
+
+            </div>
+
+
+
+            <!-- ================= REMOVE ================= -->
+
+            <form
+                method="POST"
+                action="{% url 'remove_from_cart' item.id %}"
+                class="remove-form"
+            >
+
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="remove-item"
+                >
+                    🗑 Remove
+                </button>
+
+            </form>
+
+        </div>
+
+        {% endfor %}
+
+
+
+        <!-- ================= SUMMARY ================= -->
+
+        <div class="summary">
+
+            <h2>
+                Total: ₹{{ total }}
+            </h2>
+
+            <a
+                href="{% url 'checkout' %}"
+                class="checkout-btn"
+            >
+                Proceed to Checkout →
+            </a>
+
+        </div>
+
+
+    {% else %}
+
+
+        <!-- ================= EMPTY CART ================= -->
+
+        <div class="empty-cart">
+
+            <h2>
+                🛒 Your cart is empty
+            </h2>
+
+            <p>
+                Add some products to your cart and come back here.
+            </p>
+
+            <a
+                href="{% url 'product_list' %}"
+                class="shop-btn"
+            >
+                Continue Shopping
+            </a>
+
+        </div>
+
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>

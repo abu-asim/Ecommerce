@@ -1,0 +1,1321 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Checkout - DjangoShop</title>
+
+    <link rel="stylesheet" href="{% static 'products/style.css' %}">
+
+    <!-- Razorpay Checkout -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         NAVBAR
+    ===================================================== -->
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+            <a href="/products/" class="brand">
+                DjangoShop <span>🛒</span>
+            </a>
+
+
+            <div class="nav-links">
+
+                <a href="/products/">
+                    Products
+                </a>
+
+                <a href="/products/my-orders/">
+                    My Orders
+                </a>
+
+                <a href="/products/cart/" class="cart-link">
+                    🛒 My Cart
+                </a>
+
+
+                <!-- Secure POST Logout -->
+
+                <form
+                    method="POST"
+                    action="{% url 'logout' %}"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="logout-link"
+                    >
+                        Logout
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+
+    <!-- =====================================================
+         MAIN
+    ===================================================== -->
+
+    <main class="checkout-page">
+
+
+        <!-- HEADER -->
+
+        <div class="checkout-header">
+
+            <p class="checkout-label">
+                CHECKOUT
+            </p>
+
+            <h1>
+                Complete Your Order 📦
+            </h1>
+
+            <p>
+                Enter your delivery details and place your order.
+            </p>
+
+        </div>
+
+
+
+        <!-- =================================================
+             CHECKOUT LAYOUT
+        ================================================= -->
+
+        <div class="checkout-layout">
+
+
+            <!-- =================================================
+                 DELIVERY FORM
+            ================================================= -->
+
+            <section class="checkout-form-card">
+
+
+                <div class="checkout-card-title">
+
+                    <div class="title-icon">
+                        📍
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Delivery Information
+                        </h2>
+
+                        <p>
+                            Where should we deliver your order?
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ERROR -->
+
+                {% if error %}
+
+                    <div class="checkout-error">
+                        ⚠️ {{ error }}
+                    </div>
+
+                {% endif %}
+
+
+
+                <!-- =================================================
+                     CHECKOUT FORM
+                ================================================= -->
+
+                <form
+                    method="POST"
+                    id="checkout-form"
+                    autocomplete="on"
+                >
+
+                    {% csrf_token %}
+
+
+                    <!-- =================================================
+                         FULL NAME
+                    ================================================= -->
+
+                    <div class="form-group">
+
+                        <label for="full_name">
+                            Full Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="full_name"
+                            name="full_name"
+                            value="{{ profile.full_name }}"
+                            placeholder="Enter your full name"
+                            maxlength="200"
+                            autocomplete="name"
+                            required
+                        >
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         EMAIL + PHONE
+                    ================================================= -->
+
+                    <div class="form-row">
+
+
+                        <div class="form-group">
+
+                            <label for="email">
+                                Email Address
+                            </label>
+
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                value="{{ user.email }}"
+                                placeholder="Enter your email"
+                                maxlength="254"
+                                autocomplete="email"
+                                required
+                            >
+
+                        </div>
+
+
+
+                        <div class="form-group">
+
+                            <label for="phone">
+                                Phone Number
+                            </label>
+
+                            <input
+                                type="tel"
+                                id="phone"
+                                name="phone"
+                                value="{{ profile.phone }}"
+                                placeholder="10 digit mobile number"
+                                maxlength="10"
+                                minlength="10"
+                                pattern="[6-9][0-9]{9}"
+                                inputmode="numeric"
+                                autocomplete="tel"
+                                required
+                            >
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         ADDRESS
+                    ================================================= -->
+
+                    <div class="form-group">
+
+                        <label for="address">
+                            Address
+                        </label>
+
+                        <textarea
+                            id="address"
+                            name="address"
+                            rows="4"
+                            maxlength="5000"
+                            placeholder="House no., street, area..."
+                            autocomplete="street-address"
+                            required
+                        >{{ profile.address }}</textarea>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         CITY + PINCODE
+                    ================================================= -->
+
+                    <div class="form-row">
+
+
+                        <div class="form-group">
+
+                            <label for="city">
+                                City
+                            </label>
+
+                            <input
+                                type="text"
+                                id="city"
+                                name="city"
+                                value="{{ profile.city }}"
+                                placeholder="Enter your city"
+                                maxlength="100"
+                                autocomplete="address-level2"
+                                required
+                            >
+
+                        </div>
+
+
+
+                        <div class="form-group">
+
+                            <label for="pincode">
+                                Pincode
+                            </label>
+
+                            <input
+                                type="text"
+                                id="pincode"
+                                name="pincode"
+                                value="{{ profile.pincode }}"
+                                placeholder="6 digit pincode"
+                                maxlength="6"
+                                minlength="6"
+                                pattern="[1-9][0-9]{5}"
+                                inputmode="numeric"
+                                autocomplete="postal-code"
+                                required
+                            >
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         PAYMENT METHOD
+                    ================================================= -->
+
+                    <div class="payment-method-section">
+
+
+                        <div class="payment-method-heading">
+
+                            <div class="payment-method-icon">
+                                💳
+                            </div>
+
+                            <div>
+
+                                <h3>
+                                    Payment Method
+                                </h3>
+
+                                <p>
+                                    Choose how you want to pay.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="payment-options">
+
+
+                            <!-- =================================================
+                                 COD
+                            ================================================= -->
+
+                            <label class="payment-option selected-payment">
+
+                                <input
+                                    type="radio"
+                                    name="payment_method"
+                                    value="cod"
+                                    checked
+                                >
+
+
+                                <div class="payment-option-content">
+
+
+                                    <div class="payment-option-icon">
+                                        💵
+                                    </div>
+
+
+                                    <div class="payment-option-info">
+
+                                        <strong>
+                                            Cash on Delivery
+                                        </strong>
+
+                                        <span>
+                                            Pay when your order arrives
+                                        </span>
+
+                                    </div>
+
+
+                                    <span class="payment-selected">
+                                        ✓
+                                    </span>
+
+
+                                </div>
+
+                            </label>
+
+
+
+                            <!-- =================================================
+                                 ONLINE PAYMENT
+                            ================================================= -->
+
+                            <label class="payment-option">
+
+                                <input
+                                    type="radio"
+                                    name="payment_method"
+                                    value="online"
+                                >
+
+
+                                <div class="payment-option-content">
+
+
+                                    <div class="payment-option-icon">
+                                        💳
+                                    </div>
+
+
+                                    <div class="payment-option-info">
+
+                                        <strong>
+                                            Online Payment
+                                        </strong>
+
+                                        <span>
+                                            UPI / Card / Net Banking
+                                        </span>
+
+                                    </div>
+
+
+                                    <span class="online-badge">
+                                        Secure
+                                    </span>
+
+
+                                </div>
+
+                            </label>
+
+
+                        </div>
+
+
+                        <!-- PAYMENT LOADING -->
+
+                        <div
+                            class="payment-loading"
+                            id="payment-loading"
+                        >
+                            🔄 Starting secure payment...
+                        </div>
+
+
+                        <!-- PAYMENT ERROR -->
+
+                        <div
+                            class="payment-error"
+                            id="payment-error"
+                        ></div>
+
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         PLACE ORDER BUTTON
+                    ================================================= -->
+
+                    <button
+                        type="submit"
+                        class="place-order-btn"
+                        id="place-order-btn"
+                    >
+
+                        <span id="place-order-text">
+                            🔒 Place Order Securely
+                        </span>
+
+                        <strong>
+                            →
+                        </strong>
+
+                    </button>
+
+
+                    <p class="checkout-note">
+                        🔐 Your information is securely processed.
+                    </p>
+
+
+                </form>
+
+
+            </section>
+
+
+
+            <!-- =================================================
+                 ORDER SUMMARY
+            ================================================= -->
+
+            <aside class="checkout-summary">
+
+
+                <div class="checkout-summary-card">
+
+
+                    <div class="summary-heading">
+
+                        <h2>
+                            Your Order
+                        </h2>
+
+                        <span>
+                            🧾
+                        </span>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         ITEMS
+                    ================================================= -->
+
+                    <div class="checkout-items">
+
+
+                        {% for item in cart_items %}
+
+
+                            <div class="checkout-item">
+
+
+                                <div class="checkout-item-image">
+
+
+                                    {% if item.product.image %}
+
+                                        <img
+                                            src="{{ item.product.image.url }}"
+                                            alt="{{ item.product.name }}"
+                                        >
+
+                                    {% else %}
+
+                                        <span>
+                                            📦
+                                        </span>
+
+                                    {% endif %}
+
+
+                                </div>
+
+
+
+                                <div class="checkout-item-info">
+
+                                    <h3>
+                                        {{ item.product.name }}
+                                    </h3>
+
+                                    <p>
+                                        Qty: {{ item.quantity }}
+                                    </p>
+
+                                </div>
+
+
+
+                                <strong>
+                                    ₹{% widthratio item.product.price 1 item.quantity %}
+                                </strong>
+
+
+                            </div>
+
+
+                        {% endfor %}
+
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         COUPON
+                    ================================================= -->
+
+                    <div class="coupon-box">
+
+
+                        <div class="coupon-heading">
+
+                            <span class="coupon-icon">
+                                🎟️
+                            </span>
+
+                            <div>
+
+                                <h3>
+                                    Have a Coupon?
+                                </h3>
+
+                                <p>
+                                    Apply your discount code
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+
+                        {% if coupon %}
+
+
+                            <div class="coupon-applied-card">
+
+                                <div class="coupon-applied-info">
+
+                                    <span class="coupon-check">
+                                        ✓
+                                    </span>
+
+                                    <div>
+
+                                        <strong>
+                                            {{ coupon.code }}
+                                        </strong>
+
+                                        <small>
+                                            {{ coupon.discount_percent }}% discount applied
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+
+                                <span class="coupon-applied-text">
+                                    Applied
+                                </span>
+
+                            </div>
+
+
+                        {% else %}
+
+
+                            <form
+                                method="POST"
+                                action="{% url 'apply_coupon' %}"
+                                class="coupon-form"
+                            >
+
+                                {% csrf_token %}
+
+                                <input
+                                    type="text"
+                                    name="coupon_code"
+                                    placeholder="Enter coupon code"
+                                    maxlength="50"
+                                    autocomplete="off"
+                                    required
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="apply-coupon-btn"
+                                >
+                                    Apply
+                                </button>
+
+                            </form>
+
+
+                        {% endif %}
+
+
+
+                        {% if coupon %}
+
+                            <div class="coupon-success">
+
+                                🎉 Coupon
+                                <strong>
+                                    {{ coupon.code }}
+                                </strong>
+                                applied successfully!
+
+                            </div>
+
+                        {% endif %}
+
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         TOTALS
+                    ================================================= -->
+
+                    <div class="checkout-total-area">
+
+
+                        <div class="checkout-row">
+
+                            <span>
+                                Subtotal
+                            </span>
+
+                            <strong>
+                                ₹{{ total|floatformat:2 }}
+                            </strong>
+
+                        </div>
+
+
+
+                        {% if discount > 0 %}
+
+                            <div class="checkout-row coupon-discount-row">
+
+                                <span>
+                                    🎟️ Coupon Discount
+                                </span>
+
+                                <strong>
+                                    - ₹{{ discount|floatformat:2 }}
+                                </strong>
+
+                            </div>
+
+                        {% endif %}
+
+
+
+                        <div class="checkout-row">
+
+                            <span>
+                                Delivery
+                            </span>
+
+                            <strong class="free-delivery">
+                                FREE
+                            </strong>
+
+                        </div>
+
+
+
+                        <div class="checkout-divider"></div>
+
+
+
+                        <div class="checkout-grand-total">
+
+                            <span>
+                                Total
+                            </span>
+
+                            <strong>
+                                ₹{{ final_total|floatformat:2 }}
+                            </strong>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     TRUST BOX
+                ================================================= -->
+
+                <div class="checkout-trust">
+
+                    <div>
+                        🛡️
+                    </div>
+
+                    <p>
+
+                        <strong>
+                            Safe & Secure
+                        </strong>
+
+                        <small>
+                            Your order details are protected.
+                        </small>
+
+                    </p>
+
+                </div>
+
+
+            </aside>
+
+
+        </div>
+
+
+    </main>
+
+
+
+    <!-- =====================================================
+         FOOTER
+    ===================================================== -->
+
+    <footer>
+
+        <div class="footer-content">
+
+
+            <div>
+
+                <h2>
+                    DjangoShop 🛒
+                </h2>
+
+                <p>
+                    Your simple and modern online shopping experience.
+                </p>
+
+            </div>
+
+
+
+            <div class="footer-links">
+
+                <a href="/products/">
+                    Products
+                </a>
+
+                <a href="/products/cart/">
+                    Cart
+                </a>
+
+                <a href="/products/my-orders/">
+                    Orders
+                </a>
+
+            </div>
+
+
+        </div>
+
+
+
+        <div class="footer-bottom">
+
+            © 2026 DjangoShop. All rights reserved.
+
+        </div>
+
+
+    </footer>
+
+
+
+    <!-- =====================================================
+         RAZORPAY JAVASCRIPT
+    ===================================================== -->
+
+    {% if razorpay_order_id %}
+
+    <script>
+
+        const razorpayOptions = {
+
+            key: "{{ razorpay_key_id|escapejs }}",
+
+            amount: "{{ razorpay_amount|escapejs }}",
+
+            currency: "INR",
+
+            name: "DjangoShop",
+
+            description: "DjangoShop Order Payment",
+
+            order_id: "{{ razorpay_order_id|escapejs }}",
+
+
+            prefill: {
+
+                name: "{{ order.full_name|escapejs }}",
+
+                email: "{{ order.email|escapejs }}",
+
+                contact: "{{ order.phone|escapejs }}"
+
+            },
+
+
+            notes: {
+
+                order_id: "{{ order.id|escapejs }}"
+
+            },
+
+
+            theme: {
+
+                color: "#6366f1"
+
+            },
+
+
+            handler: function (response) {
+
+                const loading =
+                    document.getElementById(
+                        "payment-loading"
+                    );
+
+                const errorBox =
+                    document.getElementById(
+                        "payment-error"
+                    );
+
+                const button =
+                    document.getElementById(
+                        "place-order-btn"
+                    );
+
+
+                loading.classList.add("show");
+
+                errorBox.classList.remove("show");
+
+                button.disabled = true;
+
+                loading.textContent =
+                    "🔐 Verifying your payment...";
+
+
+                const csrfToken =
+                    document.querySelector(
+                        '[name=csrfmiddlewaretoken]'
+                    ).value;
+
+
+                const formData =
+                    new URLSearchParams();
+
+
+                formData.append(
+                    "razorpay_payment_id",
+                    response.razorpay_payment_id
+                );
+
+                formData.append(
+                    "razorpay_order_id",
+                    response.razorpay_order_id
+                );
+
+                formData.append(
+                    "razorpay_signature",
+                    response.razorpay_signature
+                );
+
+
+                fetch(
+                    "{% url 'verify_payment' %}",
+                    {
+
+                        method: "POST",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/x-www-form-urlencoded;charset=UTF-8",
+
+                            "X-CSRFToken":
+                                csrfToken,
+
+                            "X-Requested-With":
+                                "XMLHttpRequest"
+
+                        },
+
+                        body:
+                            formData.toString()
+
+                    }
+                )
+
+
+                .then(function (response) {
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            "Payment verification request failed."
+                        );
+
+                    }
+
+                    return response.json();
+
+                })
+
+
+                .then(function (data) {
+
+                    if (data.success) {
+
+                        loading.textContent =
+                            "✅ Payment verified! Redirecting...";
+
+                        window.location.href =
+                            data.redirect_url;
+
+                    }
+
+                    else {
+
+                        button.disabled = false;
+
+                        loading.classList.remove(
+                            "show"
+                        );
+
+                        errorBox.textContent =
+                            "❌ " +
+                            (
+                                data.message ||
+                                "Payment verification failed."
+                            );
+
+                        errorBox.classList.add(
+                            "show"
+                        );
+
+                    }
+
+                })
+
+
+                .catch(function () {
+
+                    button.disabled = false;
+
+                    loading.classList.remove(
+                        "show"
+                    );
+
+                    errorBox.textContent =
+                        "❌ Something went wrong while verifying the payment. If money was deducted, please contact support.";
+
+                    errorBox.classList.add(
+                        "show"
+                    );
+
+                });
+
+            },
+
+
+            modal: {
+
+                ondismiss: function () {
+
+                    const loading =
+                        document.getElementById(
+                            "payment-loading"
+                        );
+
+                    const button =
+                        document.getElementById(
+                            "place-order-btn"
+                        );
+
+                    loading.classList.remove(
+                        "show"
+                    );
+
+                    button.disabled = false;
+
+                }
+
+            }
+
+        };
+
+
+        const razorpay =
+            new Razorpay(
+                razorpayOptions
+            );
+
+
+        razorpay.on(
+            "payment.failed",
+            function (response) {
+
+                const errorBox =
+                    document.getElementById(
+                        "payment-error"
+                    );
+
+                const button =
+                    document.getElementById(
+                        "place-order-btn"
+                    );
+
+                const loading =
+                    document.getElementById(
+                        "payment-loading"
+                    );
+
+
+                loading.classList.remove(
+                    "show"
+                );
+
+                button.disabled = false;
+
+
+                errorBox.textContent =
+                    "❌ Payment failed. Please try again.";
+
+                errorBox.classList.add(
+                    "show"
+                );
+
+            }
+        );
+
+
+        /*
+         * Automatically open Razorpay
+         * after Django creates the order.
+         */
+
+        window.addEventListener(
+            "load",
+            function () {
+
+                razorpay.open();
+
+            }
+        );
+
+    </script>
+
+    {% endif %}
+
+
+
+    <!-- =====================================================
+         PAYMENT METHOD UI + FORM PROTECTION
+    ===================================================== -->
+
+    <script>
+
+        const paymentOptions =
+            document.querySelectorAll(
+                '.payment-option'
+            );
+
+
+        paymentOptions.forEach(
+            function (option) {
+
+                const radio =
+                    option.querySelector(
+                        'input[type="radio"]'
+                    );
+
+
+                option.addEventListener(
+                    'click',
+                    function () {
+
+                        if (
+                            radio &&
+                            !radio.disabled
+                        ) {
+
+                            radio.checked = true;
+
+
+                            paymentOptions.forEach(
+                                function (item) {
+
+                                    item.classList.remove(
+                                        'selected-payment'
+                                    );
+
+                                }
+                            );
+
+
+                            option.classList.add(
+                                'selected-payment'
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+
+
+        const checkoutForm =
+            document.getElementById(
+                "checkout-form"
+            );
+
+
+        if (checkoutForm) {
+
+            let submitted = false;
+
+
+            checkoutForm.addEventListener(
+                "submit",
+                function (event) {
+
+                    /*
+                     * Browser-side validation.
+                     * Backend validation in Django is still
+                     * the real security layer.
+                     */
+
+                    if (!checkoutForm.checkValidity()) {
+
+                        return;
+
+                    }
+
+
+                    /*
+                     * Prevent accidental double submission.
+                     */
+
+                    if (submitted) {
+
+                        event.preventDefault();
+
+                        return;
+
+                    }
+
+
+                    submitted = true;
+
+
+                    const selected =
+                        document.querySelector(
+                            'input[name="payment_method"]:checked'
+                        );
+
+
+                    const button =
+                        document.getElementById(
+                            "place-order-btn"
+                        );
+
+                    const buttonText =
+                        document.getElementById(
+                            "place-order-text"
+                        );
+
+
+                    button.disabled = true;
+
+                    button.classList.add(
+                        "processing"
+                    );
+
+
+                    if (
+                        selected &&
+                        selected.value === "online"
+                    ) {
+
+                        buttonText.textContent =
+                            "💳 Starting Online Payment...";
+
+                    }
+
+                    else {
+
+                        buttonText.textContent =
+                            "🔄 Placing Order...";
+
+                    }
+
+                }
+            );
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>

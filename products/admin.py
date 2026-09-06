@@ -181,6 +181,7 @@ class OrderAdmin(admin.ModelAdmin):
         'full_name',
         'total_amount',
         'payment_method',
+        'payment_status',
         'status',
         'created_at',
     )
@@ -188,6 +189,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = (
         'status',
         'payment_method',
+        'payment_status',
         'created_at',
     )
 
@@ -196,6 +198,8 @@ class OrderAdmin(admin.ModelAdmin):
         'full_name',
         'email',
         'phone',
+        'razorpay_order_id',
+        'razorpay_payment_id',
     )
 
     ordering = (
@@ -203,6 +207,61 @@ class OrderAdmin(admin.ModelAdmin):
     )
 
     list_per_page = 20
+
+    fieldsets = (
+        (
+            '📦 Order Information',
+            {
+                'fields': (
+                    'user',
+                    'total_amount',
+                    'status',
+                    'created_at',
+                )
+            }
+        ),
+        (
+            '💳 Payment Information',
+            {
+                'fields': (
+                    'payment_method',
+                    'payment_status',
+                )
+            }
+        ),
+        (
+            '👤 Customer Details',
+            {
+                'fields': (
+                    'full_name',
+                    'email',
+                    'phone',
+                    'address',
+                    'city',
+                    'pincode',
+                )
+            }
+        ),
+        (
+            '🔐 Razorpay Details',
+            {
+                'fields': (
+                    'razorpay_order_id',
+                    'razorpay_payment_id',
+                    'razorpay_signature',
+                )
+            }
+        ),
+    )
+
+    readonly_fields = (
+        'user',
+        'total_amount',
+        'created_at',
+        'razorpay_order_id',
+        'razorpay_payment_id',
+        'razorpay_signature',
+    )
 
 
 # =====================================================

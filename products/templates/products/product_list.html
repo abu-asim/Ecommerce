@@ -70,8 +70,8 @@
 
                     <form
                        method="POST"
-                       action="{% url 'logout' %}"
-                       {% csrf_token %}>
+                       action="{% url 'logout' %}">
+                       {% csrf_token %}
 
                        <button
                           type="submit"
